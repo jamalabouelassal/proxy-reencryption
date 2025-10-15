@@ -1,0 +1,117 @@
+{% extends "base.html" %}
+
+{% block title %}Dashboard - Proxy Re-encryption{% endblock %}
+
+{% block content %}
+<div class="row">
+    <div class="col-md-4">
+        <div class="card mb-4">
+            <div class="card-header">
+                <h2 class="h4 mb-0">Send a message</h2>
+            </div>
+            <div class="card-body">
+                <form method="POST" action="{{ url_for('send_message') }}" enctype="multipart/form-data">
+                    <div class="mb-3">
+                        <label for="message" class="form-label">Message</label>
+                        <textarea class="form-control" id="message" name="message" rows="4"></textarea>
+                    </div>
+                    <div class="mb-3">
+                        <label for="image" class="form-label">Image (optional)</label>
+                        <input class="form-control" type="file" id="image" name="image" accept="image/*">
+                    </div>
+                    <div class="mb-3">
+                        <label for="recipients" class="form-label">Recipients</label>
+                        <select class="form-select" id="recipients" name="recipients" multiple required style="height: 180px;">
+                            {% for user in users %}
+                                {% if user.id != current_user.id %}
+                                    <option value="{{ user.id }}">{{ user.username }}</option>
+                                {% endif %}
+                            {% endfor %}
+                        </select>
+                        <small class="form-text text-muted">Hold Ctrl (Windows) or Cmd (Mac) to select multiple recipients.</small>
+                    </div>
+                    <button type="submit" class="btn btn-primary w-100">
+                        <i class="bi bi-send"></i> Send
+                    </button>
+                </form>
+            </div>
+        </div>
+    </div>
+
+    <div class="col-md-8">
+        <div class="card mb-4">
+            <div class="card-header">
+                <h2 class="h4 mb-0">Received Messages</h2>
+            </div>
+            <div class="card-body">
+                {% if received_messages %}
+                    {% for message_recipient in received_messages %}
+                        <div class="message-box">
+                            <div class="d-flex justify-content-between align-items-center mb-2">
+                                <span class="message-sender">
+                                    <i class="bi bi-person"></i> {{ message_recipient.message.author.username }}
+                                </span>
+                                <span class="message-timestamp">
+                                    <i class="bi bi-clock"></i> {{ message_recipient.message.timestamp.strftime('%d/%m/%Y %H:%M') }}
+                                </span>
+                            </div>
+                            <div class="encrypted-content">
+                                <i class="bi bi-lock"></i> Encrypted message
+                            </div>
+                            <a href="{{ url_for('decrypt_message', message_id=message_recipient.message.id) }}" class="btn btn-primary btn-sm">
+                                <i class="bi bi-unlock"></i> Decrypt
+                            </a>
+                        </div>
+                    {% endfor %}
+                {% else %}
+                    <p class="text-muted text-center">No messages received</p>
+                {% endif %}
+            </div>
+        </div>
+
+        <div class="card">
+            <div class="card-header">
+                <h2 class="h4 mb-0">Sent Messages</h2>
+            </div>
+            <div class="card-body">
+                {% if messages %}
+                    {% for message in messages %}
+                        <div class="message-box">
+                            <div class="d-flex justify-content-between align-items-center mb-2">
+                                <span class="message-sender">
+                                    <i class="bi bi-person"></i> Me
+                                </span>
+                                <span class="message-timestamp">
+                                    <i class="bi bi-clock"></i> {{ message.timestamp.strftime('%d/%m/%Y %H:%M') }}
+                                </span>
+                            </div>
+                            <div class="encrypted-content">
+                                <i class="bi bi-lock"></i> Encrypted message
+                            </div>
+                            <div class="mt-2">
+                                <small class="text-muted">
+                                    <i class="bi bi-people"></i> Recipients:
+                                    {% for recipient in message.recipients %}
+                                        {{ recipient.recipient.username }}{% if not loop.last %}, {% endif %}
+                                    {% endfor %}
+                                </small>
+                            </div>
+                        </div>
+                    {% endfor %}
+                {% else %}
+                    <p class="text-muted text-center">No messages sent</p>
+                {% endif %}
+            </div>
+        </div>
+    </div>
+</div>
+<div class="row justify-content-center mt-4">
+    <div class="col-md-8 text-end">
+        <form method="POST" action="{{ url_for('delete_account') }}" onsubmit="return confirm('Are you sure you want to delete your account? This action cannot be undone.');">
+            <button type="submit" class="btn btn-danger">
+                <i class="bi bi-trash"></i> Delete my account
+            </button>
+        </form>
+    </div>
+</div>
+{% endblock %} 

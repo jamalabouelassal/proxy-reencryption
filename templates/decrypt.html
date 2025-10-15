@@ -1,0 +1,40 @@
+{% extends "base.html" %}
+
+{% block title %}Decrypt Message - Proxy Re-encryption{% endblock %}
+
+{% block content %}
+<div class="row justify-content-center">
+    <div class="col-md-8">
+        <div class="card">
+            <div class="card-header">
+                <h2 class="h4 mb-0">Decrypted Message</h2>
+            </div>
+            <div class="card-body">
+                <div class="message-box">
+                    <div class="d-flex justify-content-between align-items-center mb-3">
+                        <span class="message-sender">
+                            <i class="bi bi-person"></i> {{ message.author.username }}
+                        </span>
+                        <span class="message-timestamp">
+                            <i class="bi bi-clock"></i> {{ message.timestamp.strftime('%d/%m/%Y %H:%M') }}
+                        </span>
+                    </div>
+                    <div class="decrypted-content">
+                        <i class="bi bi-chat-left-text"></i> {{ decrypted_message }}
+                    </div>
+                    {% if decrypted_image_b64 %}
+                    <div class="decrypted-image mt-4 text-center">
+                        <img src="data:image/png;base64,{{ decrypted_image_b64 }}" class="img-fluid rounded shadow" alt="Decrypted Image">
+                    </div>
+                    {% endif %}
+                </div>
+                <div class="text-center mt-4">
+                    <a href="{{ url_for('dashboard') }}" class="btn btn-primary">
+                        <i class="bi bi-arrow-left"></i> Back to Dashboard
+                    </a>
+                </div>
+            </div>
+        </div>
+    </div>
+</div>
+{% endblock %} 
